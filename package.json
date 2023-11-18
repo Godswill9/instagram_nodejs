@@ -14,7 +14,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@juliendu11/instagram-downloader": "^0.2.0",
     "axios": "^1.6.1",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
@@ -42,7 +41,6 @@
     "nodemon": "^3.0.1",
     "passport": "^0.6.0",
     "puppeteer": "^21.5.0",
-    "puppeteer-core": "^21.5.1",
     "qs": "^6.11.2",
     "sequelize": "^6.33.0",
     "socket.io": "^4.7.2",
