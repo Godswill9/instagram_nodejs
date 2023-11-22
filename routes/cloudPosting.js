@@ -107,8 +107,9 @@ route.post("/downloadReel", async (req, res) => {
         displayUrl = item.image_versions2.candidates[0].url || item.display_url;
       } else {
         videoUrl = item.video_url;
-        displayUrl = item.display_url;
+        displayUrl = item.image_versions2.candidates[0].url || item.display_url;
       }
+
       // if ("video_versions" in item) {
       //   videoUrl = item.video_versions;
       //   displayUrl = item.image_versions2 || item.display_url;
@@ -137,6 +138,7 @@ route.post("/downloadReel", async (req, res) => {
           cloudinaryThumbnailURL: thumbnailUploadResult.secure_url,
         });
       } else {
+        console.log("no video oo");
         // Treat it as an image upload if video_versions is missing
         const imageUploadResult = await cloudinary.uploader.upload(displayUrl, {
           resource_type: "image",
