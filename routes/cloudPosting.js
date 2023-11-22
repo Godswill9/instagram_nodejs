@@ -12,6 +12,7 @@ const acceptedExtensions = ["jpg", "jpeg", "png", "gif"];
 const NodeCache = require("node-cache"); // You'll need to install this package
 const uploadCache = new NodeCache(); // Initialize an upload cache
 
+//downloading from cloudinary
 route.post("/downloadVid", async (req, res) => {
   const { videoURL, videoThumbnail } = req.body;
   console.log(req.body);
@@ -68,40 +69,22 @@ route.post("/downloadVid", async (req, res) => {
   }
 });
 
-// route.post("/downloadVid", async (req, res) => {
-//   const { videoURL, videoThumbnail } = req.body;
+//normal one
+route.post("/downloadVid1", async (req, res) => {
+  const { videoURL, videoThumbnail } = req.body;
+  console.log(req.body);
+  try {
+    const result = {
+      cloudinaryVideoURL: videoURL,
+      cloudinaryVideoThumbnailURL: videoThumbnail,
+    };
 
-//   try {
-//     cloudinary.config({
-//       cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-//       api_key: process.env.CLOUDINARY_API_KEY,
-//       api_secret: process.env.CLOUDINARY_API_SECRET,
-//     });
-
-//     const uploadResult = await cloudinary.uploader.upload(videoURL, {
-//       resource_type: "video",
-//     });
-
-//     // Upload video thumbnail to Cloudinary
-//     const uploadThumbnailResult = await cloudinary.uploader.upload(
-//       videoThumbnail,
-//       {
-//         resource_type: "image",
-//       }
-//     );
-
-//     const cloudinaryVideoURL = uploadResult.secure_url;
-//     const cloudinaryVideoThumbnailURL = uploadThumbnailResult.secure_url;
-
-//     res.send({
-//       cloudinaryVideoURL,
-//       cloudinaryVideoThumbnailURL,
-//     });
-//   } catch (error) {
-//     console.error("Error:", error);
-//     res.status(500).json({ error: "Internal server error" });
-//   }
-// });
+    res.send(result);
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 
 route.post("/downloadReel", async (req, res) => {
   const { videoURL } = req.body;
@@ -120,12 +103,19 @@ route.post("/downloadReel", async (req, res) => {
       let videoUrl, displayUrl;
 
       if ("video_versions" in item) {
-        videoUrl = item.video_versions;
-        displayUrl = item.image_versions2 || item.display_url;
+        videoUrl = item.video_versions[0].url;
+        displayUrl = item.image_versions2.candidates[0].url || item.display_url;
       } else {
         videoUrl = item.video_url;
         displayUrl = item.display_url;
       }
+      // if ("video_versions" in item) {
+      //   videoUrl = item.video_versions;
+      //   displayUrl = item.image_versions2 || item.display_url;
+      // } else {
+      //   videoUrl = item.video_url;
+      //   displayUrl = item.display_url;
+      // }
 
       if (videoUrl) {
         // Upload video to Cloudinary

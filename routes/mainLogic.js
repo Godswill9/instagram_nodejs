@@ -64,6 +64,65 @@ route.post("/downloadAnotherWay", async (req, res) => {
   }
 });
 
+function getUsername(link) {
+  const regex = /\/stories\/([^/]+)/;
+  const match = link.match(regex);
+
+  if (match && match.length > 1) {
+    const username = match[1];
+    return username;
+  }
+
+  return null;
+}
+
+async function fetchAndProcessStory(urllink) {
+  const url = `https://instagram-scraper-api2.p.rapidapi.com/v1/stories?username_or_id_or_url=${getUsername(
+    urllink
+  )}`;
+  const options = {
+    method: "GET",
+    headers: {
+      "X-RapidAPI-Key": process.env.RAPID_KEY,
+      "X-RapidAPI-Host": process.env.RAPID_HOST2,
+    },
+  };
+
+  try {
+    const response = await fetch(url, options);
+    const result = await response.text();
+    return result;
+  } catch (error) {
+    console.error(error);
+  }
+}
+async function fetchAndProcessDataNew(url) {
+  try {
+    const options = {
+      method: "GET",
+      url: process.env.REQ_URL,
+      params: {
+        url: url,
+      },
+      headers: {
+        "X-RapidAPI-Key": process.env.RAPID_KEY,
+        "X-RapidAPI-Host": process.env.RAPID_HOST,
+      },
+    };
+
+    try {
+      const response = await axios.request(options);
+      return response;
+      // console.log(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}
+
 // route.post("/downloadFile", async (req, res) => {
 //   const dynamicUrl = dynamic_url_maker(req.body.url);
 //   console.log(dynamicUrl);
@@ -88,16 +147,27 @@ route.post("/downloadFile", async (req, res) => {
   console.log(dynamicUrl);
   // const dynamicUrl = req.body.url;
   try {
-    const { parsedData } = await fetchAndProcessData(dynamicUrl);
+    // const { parsedData } = await fetchAndProcessData(dynamicUrl);
     // const { parsedData } = await fetchHtmlContent(dynamicUrl);
-
-    res.send({ parsedData });
-    console.log("sent oo");
+    const result = await fetchAndProcessDataNew(req.body.url);
+    res.send({ parsedData: result.data });
   } catch (error) {
     console.error("Error:", error);
     res
       .status(500)
       .json({ error: "Internal server error", dynamicUrl: dynamicUrl });
+  }
+});
+route.post("/downloadStory", async (req, res) => {
+  // const dynamicUrl = req.body.url;
+  try {
+    // const { parsedData } = await fetchAndProcessData(dynamicUrl);
+    // const { parsedData } = await fetchHtmlContent(dynamicUrl);
+    const result = await fetchAndProcessStory(req.body.url);
+    res.send({ parsedData: JSON.parse(result) });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
