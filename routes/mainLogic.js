@@ -141,7 +141,7 @@ async function fetchAndProcessDataNew(url) {
 //   }
 // });
 
-route.post("/downloadFile", async (req, res) => {
+route.post("/downloadFile2", async (req, res) => {
   const dynamicUrl = dynamic_url_maker(req.body.url);
 
   console.log(dynamicUrl);
