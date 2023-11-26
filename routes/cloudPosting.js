@@ -158,6 +158,78 @@ route.post("/downloadReel", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+route.post("/downloadReelPrivate", async (req, res) => {
+  const { videoURL } = req.body;
+  console.log(req.body);
+
+  try {
+    cloudinary.config({
+      cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+      api_key: process.env.CLOUDINARY_API_KEY,
+      api_secret: process.env.CLOUDINARY_API_SECRET,
+    });
+
+    const uploadedLinks = [];
+
+    for (const item of videoURL) {
+      let videoUrl, displayUrl;
+
+      if ("video_versions" in item) {
+        videoUrl = item.video_versions[0].url;
+        displayUrl = item.image_versions2.candidates[0].url || item.display_url;
+      } else {
+        videoUrl = item.video_url;
+        // displayUrl = item.display_url;
+        displayUrl = item.image_versions2.candidates[0].url || item.display_url;
+      }
+
+      // if ("video_versions" in item) {
+      //   videoUrl = item.video_versions;
+      //   displayUrl = item.image_versions2 || item.display_url;
+      // } else {
+      //   videoUrl = item.video_url;
+      //   displayUrl = item.display_url;
+      // }
+
+      if (videoUrl) {
+        // Upload video to Cloudinary
+        const videoUploadResult = await cloudinary.uploader.upload(videoUrl, {
+          resource_type: "video",
+        });
+
+        // Upload thumbnail to Cloudinary
+        const thumbnailUploadResult = await cloudinary.uploader.upload(
+          displayUrl,
+          {
+            resource_type: "image",
+          }
+        );
+
+        // Push the online links to the uploadedLinks array
+        uploadedLinks.push({
+          cloudinaryVideoURL: videoUploadResult.secure_url,
+          cloudinaryThumbnailURL: thumbnailUploadResult.secure_url,
+        });
+      } else {
+        console.log("no video oo");
+        // Treat it as an image upload if video_versions is missing
+        const imageUploadResult = await cloudinary.uploader.upload(displayUrl, {
+          resource_type: "image",
+        });
+
+        uploadedLinks.push({
+          cloudinaryVideoURL: imageUploadResult.secure_url,
+          cloudinaryThumbnailURL: imageUploadResult.secure_url,
+        });
+      }
+    }
+
+    res.json({ uploadedLinks });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 
 route.post("/downloadImg", async (req, res) => {
   const { videoURL, videoThumbnail } = req.body;
