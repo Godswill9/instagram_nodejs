@@ -9,6 +9,7 @@ const app = express();
 const mainLogic = require("./routes/mainLogic");
 const cloudPosting = require("./routes/cloudPosting");
 const rateLimit = require("express-rate-limit");
+const newLogic = require("./routes/newLogic");
 
 // Create a rate limiter middleware
 // const limiter = rateLimit({
@@ -45,6 +46,7 @@ app.get("/", (req, res) => {
 
 app.use("/api", mainLogic);
 app.use("/api", cloudPosting);
+app.use("/api", newLogic);
 
 app.listen(process.env.PORT || 8088, () => {
   console.log("app is listening");
