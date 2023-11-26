@@ -174,22 +174,22 @@ route.post("/downloadReelPrivate", async (req, res) => {
     for (const item of videoURL) {
       let videoUrl, displayUrl;
 
-      if ("video_versions" in item) {
-        videoUrl = item.video_versions[0].url;
-        displayUrl = item.image_versions2.candidates[0].url || item.display_url;
-      } else {
-        videoUrl = item.video_url;
-        // displayUrl = item.display_url;
-        displayUrl = item.image_versions2.candidates[0].url || item.display_url;
-      }
-
       // if ("video_versions" in item) {
-      //   videoUrl = item.video_versions;
-      //   displayUrl = item.image_versions2 || item.display_url;
+      //   videoUrl = item.video_versions[0].url;
+      //   displayUrl = item.image_versions2.candidates[0].url || item.display_url;
       // } else {
       //   videoUrl = item.video_url;
-      //   displayUrl = item.display_url;
+      //   // displayUrl = item.display_url;
+      //   displayUrl = item.image_versions2.candidates[0].url || item.display_url;
       // }
+
+      if ("video_versions" in item) {
+        videoUrl = item.video_versions;
+        displayUrl = item.image_versions2 || item.display_url;
+      } else {
+        videoUrl = item.video_url;
+        displayUrl = item.display_url;
+      }
 
       if (videoUrl) {
         // Upload video to Cloudinary
